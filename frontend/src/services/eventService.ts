@@ -147,6 +147,15 @@ export async function updateEventSettings(
   await repoUpdateSettings(slug, requireApproval);
 }
 
+export async function saveRegistrationQuestions(
+  slug: string,
+  questions: import("@/types/event").Question[],
+) {
+  const { updateEventQuestions } =
+    await import("@/repositories/eventRepository");
+  await updateEventQuestions(slug, questions);
+}
+
 export async function addRegistrationQuestion(
   slug: string,
   text: string,

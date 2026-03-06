@@ -17,6 +17,7 @@ import {
   addRegistrationQuestion,
   updateRegistrationQuestion,
   removeRegistrationQuestion,
+  saveRegistrationQuestions,
   createEvent,
 } from "@/services/eventService";
 
@@ -289,6 +290,30 @@ export async function removeRegistrationQuestionAction(data: unknown) {
         ? error.message
         : "Failed to remove registration question";
     logger.error("Failed to remove registration question", error);
+    return { success: false, error: errorMessage };
+  }
+}
+
+export async function saveRegistrationQuestionsAction(
+  slug: string,
+  questions: import("@/types/event").Question[],
+) {
+  try {
+    if (!(await canManageEvent(slug))) {
+      return { success: false, error: "You are not authorized to update this event" };
+    }
+
+    await saveRegistrationQuestions(slug, questions);
+
+    revalidatePath(`/event/${slug}/manage`);
+    revalidatePath(`/event/${slug}/register`);
+
+    logger.info("Successfully saved registration questions", { slug });
+    return { success: true };
+  } catch (error: any) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to save registration questions";
+    logger.error("Failed to save registration questions", error);
     return { success: false, error: errorMessage };
   }
 }
